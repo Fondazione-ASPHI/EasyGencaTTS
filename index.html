@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GencaTTS @Fondazione ASPHI Onlus</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
         textarea {
             width: 90%;
             min-height: 50px;
@@ -16,12 +22,14 @@
             resize: none;
             overflow: hidden;
         }
+
         button {
             padding: 10px 15px;
             font-size: 16px;
             margin: 5px;
             cursor: pointer;
         }
+
         #settings {
             display: none;
             text-align: left;
@@ -32,6 +40,7 @@
             margin-left: auto;
             margin-right: auto;
         }
+
         #loading {
             display: none;
             font-weight: bold;
@@ -39,9 +48,11 @@
         }
     </style>
 </head>
+
 <body>
     <h2>Easy GencaTTS @Fondazione ASPHI Onlus</h2>
-    <textarea id="textInput" placeholder="Scrivi qui..." oninput="autoResize(this)" onkeypress="checkEnter(event)"></textarea>
+    <textarea id="textInput" placeholder="Scrivi qui..." oninput="autoResize(this)"
+        onkeypress="checkEnter(event)"></textarea>
     <br>
     <button onclick="correggiTesto()">GPT</button>
     <button onclick="convertiVoce()">Parla</button>
@@ -52,12 +63,15 @@
     <!-- Bottone per aprire le istruzioni in una nuova scheda -->
     <button onclick="apriIstruzioni()">📖 Leggi le Istruzioni</button>
 
+    <!-- Button to record audio -->
+    <button id="recordButton">🎙️ Hold to Record</button>
+
     <script>
-    function apriIstruzioni() {
-        window.open('https://genca79.github.io/EasyGencaTTS/README.md', '_blank');
-    }
+        function apriIstruzioni() {
+            window.open('https://genca79.github.io/EasyGencaTTS/README.md', '_blank');
+        }
     </script>
-    
+
     <p id="status"></p>
     <p id="loading">Elaborazione in corso...</p>
     <audio id="audioPlayer" controls></audio>
@@ -68,20 +82,22 @@
         <label>ID Voce: </label><input type="text" id="voiceId"><br>
         <label>Modello TTS: </label><input type="text" id="modelTTS" value="eleven_flash_v2_5"><br>
         <label>Stability: </label><input type="number" id="stability" step="0.1" min="0" max="1" value="0.5"><br>
-        <label>Similarity Boost: </label><input type="number" id="similarity" step="0.1" min="0" max="1" value="0.9"><br>
+        <label>Similarity Boost: </label><input type="number" id="similarity" step="0.1" min="0" max="1"
+            value="0.9"><br>
         <h3>Impostazioni GPT</h3>
         <label>GPT API Key: </label><input type="password" id="gptApiKey"><br>
         <label>Modello GPT: </label><input type="text" id="gptModel" value="gpt-3.5-turbo"><br>
-        <label>Prompt GPT: </label><textarea id="gptPrompt">Correggi errori di battitura, punteggiatura e grammatica nel testo. Non modificare il significato della frase. Correggi solo la frase. Non interagire con l'utente.</textarea><br>
+        <label>Prompt GPT: </label><textarea
+            id="gptPrompt">Correggi errori di battitura, punteggiatura e grammatica nel testo. Non modificare il significato della frase. Correggi solo la frase. Non interagire con l'utente.</textarea><br>
         <button onclick="salvaSettings()">Salva Impostazioni</button>
     </div>
 
     <div id="autoclick-settings" style="margin-top: 20px; text-align: center;">
         <label>
-          <input type="checkbox" id="toggleAutoclick"> Abilita clic automatico
+            <input type="checkbox" id="toggleAutoclick"> Abilita clic automatico
         </label>
         <label style="margin-left: 10px;">
-          Durata (sec): <input type="number" id="autoclickDuration" value="2" min="1" style="width: 50px;">
+            Durata (sec): <input type="number" id="autoclickDuration" value="2" min="1" style="width: 50px;">
         </label>
     </div>
 
@@ -165,7 +181,7 @@
                     body: JSON.stringify({
                         model: settings.gptModel,
                         messages: [{ role: "system", content: settings.gptPrompt },
-                                   { role: "user", content: text }]
+                        { role: "user", content: text }]
                     })
                 });
 
@@ -210,53 +226,144 @@
         }
 
         document.addEventListener("DOMContentLoaded", caricaSettings);
-            // Trova l'interruttore e il campo per i secondi
-    const toggleAutoclick = document.getElementById('toggleAutoclick');
-    const durationInput = document.getElementById('autoclickDuration');
-    let timers = new Map();
+        // Trova l'interruttore e il campo per i secondi
+        const toggleAutoclick = document.getElementById('toggleAutoclick');
+        const durationInput = document.getElementById('autoclickDuration');
+        let timers = new Map();
 
-    // Avvia il timer per il clic automatico su un bottone
-    function startAutoclick(button) {
-        if (!toggleAutoclick.checked) return;
-        let duration = parseFloat(durationInput.value) * 1000; // tempo in millisecondi
-        let startTime = Date.now();
-        
-        // Memorizza il timer e cambia il colore del bottone
-        timers.set(button, setInterval(() => {
-        let elapsed = Date.now() - startTime;
-        let progress = Math.min(elapsed / duration, 1);
-        // Il bottone cambia colore da verde a rosso
-        let red = Math.floor(255 * progress);
-        let green = 255 - red;
-        button.style.backgroundColor = 'rgb(' + red + ',' + green + ',0)';
-        if (progress >= 1) {
-            clearInterval(timers.get(button));
-            timers.delete(button);
-            button.click();
-            button.style.backgroundColor = ''; // torna al colore normale
+        // Avvia il timer per il clic automatico su un bottone
+        function startAutoclick(button) {
+            if (!toggleAutoclick.checked) return;
+            let duration = parseFloat(durationInput.value) * 1000; // tempo in millisecondi
+            let startTime = Date.now();
+
+            // Memorizza il timer e cambia il colore del bottone
+            timers.set(button, setInterval(() => {
+                let elapsed = Date.now() - startTime;
+                let progress = Math.min(elapsed / duration, 1);
+                // Il bottone cambia colore da verde a rosso
+                let red = Math.floor(255 * progress);
+                let green = 255 - red;
+                button.style.backgroundColor = 'rgb(' + red + ',' + green + ',0)';
+                if (progress >= 1) {
+                    clearInterval(timers.get(button));
+                    timers.delete(button);
+                    button.click();
+                    button.style.backgroundColor = ''; // torna al colore normale
+                }
+            }, 50));
         }
-        }, 50));
-    }
 
-    // Ferma il timer e riporta il bottone al colore normale
-    function stopAutoclick(button) {
-        if (timers.has(button)) {
-        clearInterval(timers.get(button));
-        timers.delete(button);
-        button.style.backgroundColor = ''; // riporta il colore normale
+        // Ferma il timer e riporta il bottone al colore normale
+        function stopAutoclick(button) {
+            if (timers.has(button)) {
+                clearInterval(timers.get(button));
+                timers.delete(button);
+                button.style.backgroundColor = ''; // riporta il colore normale
+            }
         }
-    }
 
-    // Aggiunge gli eventi a tutti i bottoni della pagina
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('mouseover', () => {
-        startAutoclick(button);
+        // Aggiunge gli eventi a tutti i bottoni della pagina
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('mouseover', () => {
+                startAutoclick(button);
+            });
+            button.addEventListener('mouseout', () => {
+                stopAutoclick(button);
+            });
         });
-        button.addEventListener('mouseout', () => {
-        stopAutoclick(button);
-        });
-    });
     </script>
+
+    <!-- Registrazione -->
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        // Select the button
+        const recordButton = document.getElementById('recordButton');
+
+        // Request access to the microphone
+        async function initRecorder() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+
+                // Store audio chunks when recorded
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                // When recording stops, send audio to the server
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    audioChunks = []; // Reset chunks for the next recording
+
+                    // Convert Blob to base64 string correctly
+                    const arrayBuffer = await audioBlob.arrayBuffer();
+                    const byteArray = new Uint8Array(arrayBuffer);
+                    let binaryString = '';
+                    byteArray.forEach(byte => {
+                        binaryString += String.fromCharCode(byte);
+                    });
+                    const base64Audio = btoa(binaryString);
+
+                    // Prepare the dictionary with audio data
+                    const audioData = {
+                        nick: 'pasphi',
+                        voce: base64Audio
+                    };
+
+                    // Send audio to the server with a POST request
+                    try {
+                        const response = await fetch('https://capisciame.ext.cineca.it/ricowav', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(audioData)
+                        });
+
+                        if (!response.ok) throw new Error('Error sending audio data');
+
+                        const responseData = await response.json();
+                        const textResponse = responseData["parola"];
+                        console.log('Server response:', textResponse);
+
+                        // Convert the response text to speech and play it
+                        const utterance = new SpeechSynthesisUtterance(textResponse);
+                        window.speechSynthesis.speak(utterance);
+
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                };
+            } catch (error) {
+                console.error('Microphone access error:', error);
+            }
+        }
+
+        // Start recording when the button is pressed
+        recordButton.addEventListener('mousedown', () => {
+            if (mediaRecorder && mediaRecorder.state === 'inactive') {
+                mediaRecorder.start();
+                console.log('Recording started');
+            }
+        });
+
+        // Stop recording when the button is released and process the response
+        recordButton.addEventListener('mouseup', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                console.log('Recording stopped');
+            }
+        });
+
+        // Initialize the audio recorder when the page loads
+        document.addEventListener('DOMContentLoaded', initRecorder);
+    </script>
+
+
 </body>
+
 </html>
