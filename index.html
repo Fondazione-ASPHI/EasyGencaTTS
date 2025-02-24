@@ -329,10 +329,13 @@
                         const responseData = await response.json();
                         const textResponse = responseData["parola"];
                         console.log('Server response:', textResponse);
+                        document.getElementById("textInput").value = textResponse;
+                        await correggiTesto();
+                        await convertiVoce();
 
                         // Convert the response text to speech and play it
-                        const utterance = new SpeechSynthesisUtterance(textResponse);
-                        window.speechSynthesis.speak(utterance);
+                        // const utterance = new SpeechSynthesisUtterance(textResponse);
+                        // window.speechSynthesis.speak(utterance);
 
                     } catch (error) {
                         console.error('Error:', error);
