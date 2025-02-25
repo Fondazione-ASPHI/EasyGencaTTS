@@ -140,25 +140,30 @@
             }
         }
 
-        // Attiva il riconoscimento vocale
-        // Attiva il riconoscimento vocale con controllo dei permessi
+       
+        
+        // Attiva il riconoscimento vocale e gestisce l'autorizzazione
         async function attivaAscolto() {
             if (!('webkitSpeechRecognition' in window)) {
                 alert('Il riconoscimento vocale non è supportato da questo browser.');
                 return;
             }
 
-            // Controllo dei permessi del microfono
-            try {
-                const permissions = await navigator.permissions.query({ name: 'microphone' });
-                if (permissions.state !== 'granted') {
-                    alert('Concedi l\'autorizzazione al microfono per attivare il riconoscimento vocale.');
+            // Verifica lo stato dell'autorizzazione
+            let permissionGranted = localStorage.getItem("microphonePermission");
+
+            if (permissionGranted !== "granted") {
+                try {
+                    // Richiede l'autorizzazione al microfono
+                    await navigator.mediaDevices.getUserMedia({ audio: true });
+                    localStorage.setItem("microphonePermission", "granted");
+                } catch (error) {
+                    alert("Permesso per il microfono negato. Concedi l'accesso per usare il riconoscimento vocale.");
                     return;
                 }
-            } catch (e) {
-                console.log("Il controllo dei permessi non è supportato da questo browser.");
             }
 
+            // Avvia il riconoscimento vocale
             let recognition = new webkitSpeechRecognition();
             recognition.lang = 'it-IT';
             recognition.interimResults = false;
@@ -177,6 +182,7 @@
                 document.getElementById("status").innerText = "Errore nel riconoscimento vocale: " + event.error;
             };
         }
+
 
 
         // Genera 6 suggerimenti plausibili usando GPT
