@@ -2,13 +2,15 @@
 
 Easy GencaTTS è un semplice comunicatore che permette di supportare nella comunicazione le persone con disabilità. Si può scrivere con la tastiera fisica o le tastiere virtuali (anche con puntatore oculare) in un campo di testo.  
 Si basa su un codice HTML con JavaScript per un'interfaccia di sintesi vocale e correzione del testo, sviluppata dalla Fondazione ASPHI Onlus. L'app usa le API di ElevenLabs per la conversione testo-voce (TTS) e di OpenAI per correggere errori grammaticali e di punteggiatura.
-Questo semplice comunicatore può girare su pc o su smartphone e si apre con qualsiasi Browser Web (consigliato Google Chrome)
+Questo semplice comunicatore può girare su pc, tablet o su smartphone connessi a internet e si apre con qualsiasi Browser Web (consigliato Google Chrome)
 
-•	Inserimento del testo: L'utente può scrivere o incollare del testo.
-•	Correzione automatica: Il bottone "GPT" invia il testo all'API di OpenAI per correggerlo (ortografia, errori di battitura, omissioni di lettere e spazi, ecc.). Dall’interfaccia settings il prompt può essere modificato o cambiato del tutto.
-•	Sintesi vocale: Il bottone "Parla" usa ElevenLabs per generare un audio con sintesi vocale del testo. In ElevenLabs si trovano voci molto naturali e con i piani a pagamento si possono anche creare sintesi vocali clonate a partire dalla voce naturale di una persona.
-•	Impostazioni personalizzabili: Permette di inserire chiavi API, ID voce e parametri di qualità vocale e cambiare le istruzioni per il correttore GPT (ad esempio facendo traduzioni ad altre lingue o altre elaborazioni creative del testo).
-•	Clic automatico: Attiva automaticamente i pulsanti dopo un certo tempo al passaggio del mouse (da utilizzare per chi usa emulatori di mouse o non riesce a cliccare)
+• Inserimento del testo: L'utente può scrivere o incollare del testo.
+• Correzione automatica: Il bottone "GPT" invia il testo all'API di OpenAI per correggerlo (ortografia, errori di battitura, omissioni di lettere e spazi, ecc.). Dall’interfaccia settings il prompt può essere modificato o cambiato del tutto.
+• Sintesi vocale: Il bottone "Parla" usa ElevenLabs per generare un audio con sintesi vocale del testo. In ElevenLabs si trovano voci molto naturali e con i piani a pagamento si possono anche creare sintesi vocali clonate a partire dalla voce naturale di una persona.
+• Impostazioni personalizzabili: Permette di inserire chiavi API, ID voce e parametri di qualità vocale e cambiare le istruzioni per il correttore GPT (ad esempio facendo traduzioni ad altre lingue o altre elaborazioni creative del testo).
+• Clic automatico: Attiva automaticamente i pulsanti dopo un certo tempo al passaggio del mouse (da utilizzare per chi usa emulatori di mouse o non riesce a cliccare)
+• Funzione Conversazione: attiva il microfono per accedere a quel che viene detto intorno al dispositivo. Propone automaticamente 6 frasi plausibili e contestuali generate da GPT. 
+
 
 ________________________________________
 🔧 1. Requisiti iniziali
@@ -69,6 +71,9 @@ o	🔊 Parla: Converte il testo in voce utilizzando ElevenLabs.
 o	❌ Cancella: Pulisce il campo di testo.
 o	⚙️ Settings: Apre le impostazioni.
 o	🔲 Schermo Intero: Attiva/disattiva la modalità a schermo intero.
+o	🎤 Conversazione: Attiva il microfono per ascoltare quello che viene detto e proporre frasi di risposta o replica contestuale tra cui scegliere.
+
+
 ________________________________________
 🏁 5. Funzioni avanzate
 🖱️ Clic automatico

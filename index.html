@@ -59,7 +59,7 @@
     <button onclick="cancellaTesto()">Cancella</button>
     <button onclick="toggleSettings()">⚙️ Settings</button>
     <button onclick="toggleFullScreen()">🔲 Schermo Intero</button>
-
+    <button onclick="attivaAscolto()">🎤 Conversazione</button>
     <!-- Bottone per aprire le istruzioni in una nuova scheda -->
     <button onclick="apriIstruzioni()">📖 Leggi le Istruzioni</button>
 
@@ -71,6 +71,7 @@
             window.open('https://genca79.github.io/EasyGencaTTS/README.md', '_blank');
         }
     </script>
+    <div id="suggestions" style="margin-top: 20px;"></div>
 
     <p id="status"></p>
     <p id="loading">Elaborazione in corso...</p>
@@ -162,6 +163,113 @@
                 document.getElementById("gptPrompt").value = settings.gptPrompt || "Correggi errori di battitura, punteggiatura e grammatica nel testo. Non modificare il significato della frase. Correggi solo la frase non interagire con altre parole.";
             }
         }
+
+
+
+        // Attiva il riconoscimento vocale e gestisce l'autorizzazione
+        async function attivaAscolto() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Il riconoscimento vocale non è supportato da questo browser.');
+                return;
+            }
+
+            // Verifica lo stato dell'autorizzazione
+            let permissionGranted = localStorage.getItem("microphonePermission");
+
+            if (permissionGranted !== "granted") {
+                try {
+                    // Richiede l'autorizzazione al microfono
+                    await navigator.mediaDevices.getUserMedia({ audio: true });
+                    localStorage.setItem("microphonePermission", "granted");
+                } catch (error) {
+                    alert("Permesso per il microfono negato. Concedi l'accesso per usare il riconoscimento vocale.");
+                    return;
+                }
+            }
+
+            // Avvia il riconoscimento vocale
+            let recognition = new webkitSpeechRecognition();
+            recognition.lang = 'it-IT';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.start();
+            document.getElementById("status").innerText = "In ascolto...";
+
+            recognition.onresult = async function (event) {
+                let trascritto = event.results[0][0].transcript;
+                document.getElementById("status").innerText = "Riconosciuto: " + trascritto;
+                generaSuggerimenti(trascritto);
+            };
+
+            recognition.onerror = function (event) {
+                document.getElementById("status").innerText = "Errore nel riconoscimento vocale: " + event.error;
+            };
+        }
+
+
+
+        // Genera 6 suggerimenti plausibili usando GPT
+        async function generaSuggerimenti(testoRiconosciuto) {
+            let settings = JSON.parse(localStorage.getItem("ttsSettings"));
+            if (!settings.gptApiKey) return alert("Configura l'API GPT nelle impostazioni!");
+
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("status").innerText = "Generazione suggerimenti in corso...";
+
+            try {
+                const prompt = `A partire da questa frase: "${testoRiconosciuto}", genera 6 risposte plausibili nel contesto di una conversazione dove tu sei la persona a cui è rivolta la frase riconosciuta. Non numerare le frasi.`;
+
+                const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${settings.gptApiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: settings.gptModel,
+                        messages: [{ role: "system", content: prompt }]
+                    })
+                });
+
+                if (!response.ok) throw new Error("Errore nella generazione dei suggerimenti");
+
+                const result = await response.json();
+                let suggerimenti = result.choices[0].message.content.split("\n").filter(f => f.trim() !== "");
+
+                mostraSuggerimenti(suggerimenti.slice(0, 6)); // Mostra le prime 6 risposte
+            } catch (error) {
+                document.getElementById("status").innerText = "Errore: " + error.message;
+            } finally {
+                document.getElementById("loading").style.display = "none";
+            }
+        }
+
+        // Mostra le 6 frasi come bottoni cliccabili senza numerazione
+        function mostraSuggerimenti(suggerimenti) {
+            let suggestionsDiv = document.getElementById("suggestions");
+            suggestionsDiv.innerHTML = "<h3>Suggerimenti:</h3>";
+
+            suggerimenti.forEach(frase => {
+                let btn = document.createElement("button");
+                btn.innerText = frase.trim();
+                btn.style.margin = "5px";
+                btn.onclick = async function () {
+                    document.getElementById("textInput").value = frase.trim();
+                    suggestionsDiv.innerHTML = ""; // Rimuove tutti i suggerimenti dopo la selezione
+                    await convertiVoce();
+
+                    const audioPlayer = document.getElementById("audioPlayer");
+                    audioPlayer.onended = function () {
+                        attivaAscolto(); // Riattiva l'ascolto quando l'audio finisce
+                    };
+
+                };
+                suggestionsDiv.appendChild(btn);
+            });
+        }
+
+
 
         async function correggiTesto() {
             let text = document.getElementById("textInput").value.trim();
