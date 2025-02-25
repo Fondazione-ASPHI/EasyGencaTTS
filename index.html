@@ -60,6 +60,14 @@
     <button onclick="toggleSettings()">⚙️ Settings</button>
     <button onclick="toggleFullScreen()">🔲 Schermo Intero</button>
     <button onclick="attivaAscolto()">🎤 Conversazione</button>
+    <!-- Bottone per aprire le istruzioni in una nuova scheda -->
+    <button onclick="apriIstruzioni()">📖 Leggi le Istruzioni</button>
+
+    <script>
+    function apriIstruzioni() {
+        window.open('https://genca79.github.io/EasyGencaTTS/README.md', '_blank');
+    }
+    </script>
     <div id="suggestions" style="margin-top: 20px;"></div>
 
     <p id="status"></p>
