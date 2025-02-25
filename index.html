@@ -152,7 +152,7 @@
             // Verifica lo stato dell'autorizzazione
             let permissionGranted = localStorage.getItem("microphonePermission");
 
-            if (permissionGranted !== "granted") {
+           if (permissionGranted !== "granted") {
                 try {
                     // Richiede l'autorizzazione al microfono
                     await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -161,7 +161,7 @@
                     alert("Permesso per il microfono negato. Concedi l'accesso per usare il riconoscimento vocale.");
                     return;
                 }
-            }
+            } 
 
             // Avvia il riconoscimento vocale
             let recognition = new webkitSpeechRecognition();
@@ -230,11 +230,11 @@
                 let btn = document.createElement("button");
                 btn.innerText = frase.trim();
                 btn.style.margin = "5px";
-                btn.onclick = function() {
+                btn.onclick = async function() {
                     document.getElementById("textInput").value = frase.trim();
                     suggestionsDiv.innerHTML = ""; // Rimuove tutti i suggerimenti dopo la selezione
-                    convertiVoce();
-                    attivaAscolto();
+                    await convertiVoce();
+                    await attivaAscolto();
                 };
                 suggestionsDiv.appendChild(btn);
             });
