@@ -54,7 +54,7 @@
     <textarea id="textInput" placeholder="Scrivi qui..." oninput="autoResize(this)"
         onkeypress="checkEnter(event)"></textarea>
     <br>
-    <button onclick="correggiTesto()">GPT</button>
+    <button onclick="correggiTesto()">Correggi</button>
     <button onclick="convertiVoce()">Parla</button>
     <button onclick="cancellaTesto()">Cancella</button>
     <button onclick="toggleSettings()">⚙️ Settings</button>
@@ -64,7 +64,8 @@
     <button onclick="apriIstruzioni()">📖 Leggi le Istruzioni</button>
 
     <!-- Button to record audio -->
-    <button id="recordButton">Ripeti</button>
+    <button id="CapisciAMe_Button"><img src="CapisciAMe.png" alt="Button Image"
+            style="width: 50px; height: 50px;"></button>
 
     <script>
         function apriIstruzioni() {
@@ -389,7 +390,7 @@
         let audioChunks = [];
 
         // Select the button
-        const recordButton = document.getElementById('recordButton');
+        const CapisciAMe_Button = document.getElementById('CapisciAMe_Button');
 
         // Request access to the microphone
         async function initRecorder() {
@@ -455,7 +456,7 @@
         }
 
         // Start recording when the button is pressed
-        recordButton.addEventListener('mousedown', () => {
+        CapisciAMe_Button.addEventListener('mousedown', () => {
             if (mediaRecorder && mediaRecorder.state === 'inactive') {
                 mediaRecorder.start();
                 console.log('Recording started');
@@ -463,7 +464,7 @@
         });
 
         // Stop recording when the button is released and process the response
-        recordButton.addEventListener('mouseup', () => {
+        CapisciAMe_Button.addEventListener('mouseup', () => {
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
                 console.log('Recording stopped');
