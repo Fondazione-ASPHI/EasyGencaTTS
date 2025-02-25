@@ -46,11 +46,23 @@
             font-weight: bold;
             color: blue;
         }
+
+        .autoclickLabel{
+            margin-left: 10px;
+        }
+        .autoclick-settings{
+            margin-top: 20px; text-align: center;
+        } 
+        .autoclickDuration{
+
+            width: 50px;
+        } 
+
     </style>
 </head>
 
 <body>
-    <h2>Easy GencaTTS @Fondazione ASPHI Onlus</h2>
+    <h1>Easy GencaTTS @Fondazione ASPHI Onlus</h1>
     <textarea id="textInput" placeholder="Scrivi qui..." oninput="autoResize(this)"
         onkeypress="checkEnter(event)"></textarea>
     <br>
@@ -77,28 +89,30 @@
     <audio id="audioPlayer" controls></audio>
 
     <div id="settings">
-        <h3>Impostazioni API</h3>
-        <label>ElevenLabs API Key: </label><input type="password" id="apiKey"><br>
-        <label>ID Voce: </label><input type="text" id="voiceId"><br>
-        <label>Modello TTS: </label><input type="text" id="modelTTS" value="eleven_flash_v2_5"><br>
-        <label>Stability: </label><input type="number" id="stability" step="0.1" min="0" max="1" value="0.5"><br>
-        <label>Similarity Boost: </label><input type="number" id="similarity" step="0.1" min="0" max="1"
+        <h2>Impostazioni API</h2>
+        <label for="apiKey">ElevenLabs API Key: </label><input type="password" id="apiKey"><br>
+        <label for="voiceId">ID Voce: </label><input type="text" id="voiceId"><br>
+        <label for="modelTTS">Modello TTS: </label><input type="text" id="modelTTS" value="eleven_flash_v2_5"><br>
+        <label for="stability">Stability: </label><input type="number" id="stability" step="0.1" min="0" max="1" value="0.5"><br>
+        <label for="similarity">Similarity Boost: </label><input type="number" id="similarity" step="0.1" min="0" max="1"
             value="0.9"><br>
-        <h3>Impostazioni GPT</h3>
-        <label>GPT API Key: </label><input type="password" id="gptApiKey"><br>
-        <label>Modello GPT: </label><input type="text" id="gptModel" value="gpt-3.5-turbo"><br>
-        <label>Prompt GPT: </label><textarea
+        <h2>Impostazioni GPT</h2>
+        <label for ="gptApiKey">GPT API Key: </label><input type="password" id="gptApiKey"><br>
+        <label for="gptModel">Modello GPT: </label><input type="text" id="gptModel" value="gpt-3.5-turbo"><br>
+        <label for="gptPrompt">Prompt GPT: </label><textarea
             id="gptPrompt">Correggi errori di battitura, punteggiatura e grammatica nel testo. Non modificare il significato della frase. Correggi solo la frase. Non interagire con l'utente.</textarea><br>
         <button onclick="salvaSettings()">Salva Impostazioni</button>
     </div>
 
-    <div id="autoclick-settings" style="margin-top: 20px; text-align: center;">
-        <label>
-            <input type="checkbox" id="toggleAutoclick"> Abilita clic automatico
+    <div id="autoclick-settings" class="autoclick-settings">
+        <input id="checkAutoclick" type="checkbox" id="toggleAutoclick">
+        <label for="checkAutoclick">
+             Abilita clic automatico
         </label>
-        <label style="margin-left: 10px;">
-            Durata (sec): <input type="number" id="autoclickDuration" value="2" min="1" style="width: 50px;">
+        <label for="autoclickDuration" class="autoclickLabel">
+            Durata (sec):
         </label>
+        <input type="number" id="autoclickDuration" value="2" min="1" class="autoclickDuration">
     </div>
 
     <script>
