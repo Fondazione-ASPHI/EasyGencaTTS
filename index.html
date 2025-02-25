@@ -107,6 +107,9 @@
     </div>
 
     <script>
+
+        var show_settings = false;
+
         function autoResize(textarea) {
             textarea.style.height = "auto";
             textarea.style.height = textarea.scrollHeight + "px";
@@ -134,9 +137,14 @@
         }
 
         function toggleSettings() {
+            show_settings = !show_settings;
             let settingsDiv = document.getElementById("settings");
-            settingsDiv.style.display = settingsDiv.style.display === "none" ? "block" : "none";
-            caricaSettings();
+            if (show_settings) {
+                settingsDiv.style.display = "block";
+                caricaSettings();
+            } else {
+                settingsDiv.style.display = "none";
+            }
         }
 
         function salvaSettings() {
