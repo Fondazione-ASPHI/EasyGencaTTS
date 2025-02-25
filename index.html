@@ -53,20 +53,23 @@
     <h2>Easy GencaTTS @Fondazione ASPHI Onlus</h2>
     <textarea id="textInput" placeholder="Scrivi qui..." oninput="autoResize(this)"
         onkeypress="checkEnter(event)"></textarea>
-    <br>
-    <button onclick="correggiTesto()">Correggi</button>
-    <button onclick="convertiVoce()">Parla</button>
-    <button onclick="cancellaTesto()">Cancella</button>
-    <button onclick="toggleSettings()">⚙️ Settings</button>
-    <button onclick="toggleFullScreen()">🔲 Schermo Intero</button>
-    <button onclick="attivaAscolto()">🎤 Conversazione</button>
-    <!-- Bottone per aprire le istruzioni in una nuova scheda -->
-    <button onclick="apriIstruzioni()">📖 Leggi le Istruzioni</button>
-
+    <p>
+        <button onclick="correggiTesto()">Correggi</button>
+        <button onclick="convertiVoce()">Parla</button>
+        <button onclick="cancellaTesto()">Cancella</button>
+        <button onclick="toggleSettings()">⚙️ Settings</button>
+        <button onclick="toggleFullScreen()">🔲 Schermo Intero</button>
+        <button onclick="attivaAscolto()">🎤 Conversazione</button>
+        <!-- Bottone per aprire le istruzioni in una nuova scheda -->
+        <button onclick="apriIstruzioni()">📖 Leggi le Istruzioni</button>
+    </p>
     <!-- Button to record audio -->
-    <button id="CapisciAMe_Button"><img src="CapisciAMe.png" alt="Button Image"
-            style="width: 50px; height: 50px;"></button>
+    <p>
+        <button id="CapisciAMe_Button"><img src="CapisciAMe.png" alt="CapisciAMe Button Image"
+                style="width: 50px; height: 50px;"></button>
+    </p>
 
+    
     <script>
         function apriIstruzioni() {
             window.open('https://genca79.github.io/EasyGencaTTS/README.md', '_blank');
