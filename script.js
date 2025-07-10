@@ -210,6 +210,25 @@ async function convertiVoce() {
     let settings = JSON.parse(localStorage.getItem("ttsSettings"));
     if (!text || !settings.apiKey) return alert("Inserisci un testo e configura l'API ElevenLabs");
 
+    // Create a unique cache key based on text and voice settings
+    const cacheKey = `tts_${settings.voiceId}_${settings.modelTTS}_${btoa(text)}`;
+    
+    // Check if we have cached audio for this exact text and settings
+    const cachedAudio = localStorage.getItem(cacheKey);
+    if (cachedAudio) {
+        // Use cached audio
+        try {
+            const audioBlob = dataURItoBlob(cachedAudio);
+            document.getElementById("audioPlayer").src = URL.createObjectURL(audioBlob);
+            document.getElementById("audioPlayer").play();
+            document.getElementById("status").innerText = "Audio riprodotto dalla cache!";
+            return;
+        } catch (error) {
+            // If cached audio is corrupted, remove it and generate new one
+            localStorage.removeItem(cacheKey);
+        }
+    }
+
     document.getElementById("loading").style.display = "block";
     document.getElementById("status").innerText = "";
 
@@ -223,13 +242,51 @@ async function convertiVoce() {
         if (!response.ok) throw new Error("Errore nella generazione audio");
 
         const audioBlob = await response.blob();
+        
+        // Cache the audio blob as data URI
+        const reader = new FileReader();
+        reader.onload = function() {
+            try {
+                // Store in cache, but manage storage size
+                manageTTSCache();
+                localStorage.setItem(cacheKey, reader.result);
+            } catch (error) {
+                console.warn("Could not cache audio due to storage limitations:", error);
+            }
+        };
+        reader.readAsDataURL(audioBlob);
+        
         document.getElementById("audioPlayer").src = URL.createObjectURL(audioBlob);
         document.getElementById("audioPlayer").play();
-        document.getElementById("status").innerText = "Audio generato!";
+        document.getElementById("status").innerText = "Audio generato e salvato in cache!";
     } catch (error) {
         document.getElementById("status").innerText = "Errore: " + error.message;
     } finally {
         document.getElementById("loading").style.display = "none";
+    }
+}
+
+// Helper function to convert data URI to blob
+function dataURItoBlob(dataURI) {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], {type: mimeString});
+}
+
+// Manage TTS cache to prevent localStorage overflow
+function manageTTSCache() {
+    const maxCacheEntries = 10; // Keep only last 10 audio files
+    const ttsKeys = Object.keys(localStorage).filter(key => key.startsWith('tts_'));
+    
+    if (ttsKeys.length >= maxCacheEntries) {
+        // Remove oldest entries (simple FIFO approach)
+        const keysToRemove = ttsKeys.slice(0, ttsKeys.length - maxCacheEntries + 1);
+        keysToRemove.forEach(key => localStorage.removeItem(key));
     }
 }
 
