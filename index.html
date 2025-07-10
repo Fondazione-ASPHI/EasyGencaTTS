@@ -10,47 +10,55 @@
 </head>
 
 <body>
-    <h2>Easy GencaTTS @Fondazione ASPHI Onlus</h2>
-    <textarea id="textInput" placeholder="Scrivi qui..." oninput="autoResize(this)"
+    <div id="language-selector">
+        <label for="languageSelect">🌐</label>
+        <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="it">Italiano</option>
+        </select>
+    </div>
+
+    <h2 data-translate="title">Easy GencaTTS @Fondazione ASPHI Onlus</h2>
+    <textarea id="textInput" data-translate-placeholder="placeholder_text" placeholder="Write here..." oninput="autoResize(this)"
         onkeypress="checkEnter(event)"></textarea>
     <br>
-    <button onclick="correggiTesto()">GPT</button>
-    <button onclick="convertiVoce()">Parla</button>
-    <button onclick="cancellaTesto()">Cancella</button>
-    <button onclick="toggleSettings()">⚙️ Settings</button>
-    <button onclick="toggleFullScreen()">🔲 Schermo Intero</button>
-    <button onclick="attivaAscolto()">🎤 Conversazione</button>
+    <button onclick="correggiTesto()" data-translate="gpt_button">GPT</button>
+    <button onclick="convertiVoce()" data-translate="speak_button">Speak</button>
+    <button onclick="cancellaTesto()" data-translate="clear_button">Clear</button>
+    <button onclick="toggleSettings()" data-translate="settings_button">⚙️ Settings</button>
+    <button onclick="toggleFullScreen()" data-translate="fullscreen_button">🔲 Full Screen</button>
+    <button onclick="attivaAscolto()" data-translate="conversation_button">🎤 Conversation</button>
     <!-- Bottone per aprire le istruzioni in una nuova scheda -->
-    <button onclick="apriIstruzioni()">📖 Leggi le Istruzioni</button>
+    <button onclick="apriIstruzioni()" data-translate="instructions_button">📖 Read Instructions</button>
 
     <div id="suggestions" style="margin-top: 20px;"></div>
 
     <p id="status"></p>
-    <p id="loading">Elaborazione in corso...</p>
+    <p id="loading" data-translate="loading_text">Processing...</p>
     <audio id="audioPlayer" controls></audio>
 
     <div id="settings">
-        <h3>Impostazioni API</h3>
-        <label>ElevenLabs API Key: </label><input type="password" id="apiKey"><br>
-        <label>ID Voce: </label><input type="text" id="voiceId"><br>
-        <label>Modello TTS: </label><input type="text" id="modelTTS" value="eleven_flash_v2_5"><br>
-        <label>Stability: </label><input type="number" id="stability" step="0.1" min="0" max="1" value="0.5"><br>
-        <label>Similarity Boost: </label><input type="number" id="similarity" step="0.1" min="0" max="1"
+        <h3 data-translate="api_settings_title">API Settings</h3>
+        <label data-translate="elevenlabs_api_key">ElevenLabs API Key: </label><input type="password" id="apiKey"><br>
+        <label data-translate="voice_id">Voice ID: </label><input type="text" id="voiceId"><br>
+        <label data-translate="tts_model">TTS Model: </label><input type="text" id="modelTTS" value="eleven_flash_v2_5"><br>
+        <label data-translate="stability">Stability: </label><input type="number" id="stability" step="0.1" min="0" max="1" value="0.5"><br>
+        <label data-translate="similarity_boost">Similarity Boost: </label><input type="number" id="similarity" step="0.1" min="0" max="1"
             value="0.9"><br>
-        <h3>Impostazioni GPT</h3>
-        <label>GPT API Key: </label><input type="password" id="gptApiKey"><br>
-        <label>Modello GPT: </label><input type="text" id="gptModel" value="gpt-3.5-turbo"><br>
-        <label>Prompt GPT: </label><textarea
-            id="gptPrompt">Correggi errori di battitura, punteggiatura e grammatica nel testo. Non modificare il significato della frase. Correggi solo la frase. Non interagire con l'utente.</textarea><br>
-        <button onclick="salvaSettings()">Salva Impostazioni</button>
+        <h3 data-translate="gpt_settings_title">GPT Settings</h3>
+        <label data-translate="gpt_api_key">GPT API Key: </label><input type="password" id="gptApiKey"><br>
+        <label data-translate="gpt_model">GPT Model: </label><input type="text" id="gptModel" value="gpt-3.5-turbo"><br>
+        <label data-translate="gpt_prompt">GPT Prompt: </label><textarea
+            id="gptPrompt">Correct typing, punctuation and grammar errors in the text. Do not change the meaning of the sentence. Only correct the sentence. Do not interact with the user.</textarea><br>
+        <button onclick="salvaSettings()" data-translate="save_settings">Save Settings</button>
     </div>
 
     <div id="autoclick-settings" style="margin-top: 20px; text-align: center;">
         <label>
-            <input type="checkbox" id="toggleAutoclick"> Abilita clic automatico
+            <input type="checkbox" id="toggleAutoclick"> <span data-translate="enable_autoclick">Enable auto-click</span>
         </label>
         <label style="margin-left: 10px;">
-            Durata (sec): <input type="number" id="autoclickDuration" value="2" min="1" style="width: 50px;">
+            <span data-translate="duration_seconds">Duration (sec): </span><input type="number" id="autoclickDuration" value="2" min="1" style="width: 50px;">
         </label>
     </div>
 
