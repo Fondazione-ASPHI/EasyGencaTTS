@@ -162,6 +162,9 @@ function changeLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('selectedLanguage', lang);
     
+    // Update the HTML lang attribute
+    document.documentElement.setAttribute('lang', lang);
+    
     // Update all elements with data-translate attribute
     document.querySelectorAll('[data-translate]').forEach(element => {
         const key = element.getAttribute('data-translate');
