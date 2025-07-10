@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -10,61 +10,154 @@
 </head>
 
 <body>
-    <div id="language-selector">
-        <label for="languageSelect">🌐</label>
-        <select id="languageSelect">
-            <option value="en">English</option>
-            <option value="it">Italiano</option>
-        </select>
-    </div>
+    <header>
+        <div id="language-selector">
+            <label for="languageSelect">🌐 <span data-translate="language_selector" class="sr-only">Language:</span></label>
+            <select id="languageSelect" aria-label="Select language">
+                <option value="en">English</option>
+                <option value="it">Italiano</option>
+            </select>
+        </div>
+    </header>
 
-    <h2 data-translate="title">Easy GencaTTS @Fondazione ASPHI Onlus</h2>
-    <textarea id="textInput" data-translate-placeholder="placeholder_text" placeholder="Write here..." oninput="autoResize(this)"
-        onkeypress="checkEnter(event)"></textarea>
-    <br>
-    <button onclick="correggiTesto()" data-translate="gpt_button">GPT</button>
-    <button onclick="convertiVoce()" data-translate="speak_button">Speak</button>
-    <button onclick="cancellaTesto()" data-translate="clear_button">Clear</button>
-    <button onclick="toggleSettings()" data-translate="settings_button">⚙️ Settings</button>
-    <button onclick="toggleFullScreen()" data-translate="fullscreen_button">🔲 Full Screen</button>
-    <button onclick="attivaAscolto()" data-translate="conversation_button">🎤 Conversation</button>
-    <!-- Bottone per aprire le istruzioni in una nuova scheda -->
-    <button onclick="apriIstruzioni()" data-translate="instructions_button">📖 Read Instructions</button>
+    <main>
+        <h1 data-translate="title">Easy GencaTTS @Fondazione ASPHI Onlus</h1>
+        
+        <section aria-labelledby="text-input-section">
+            <h2 id="text-input-section" class="sr-only" data-translate="text_input_section">Text Input</h2>
+            <label for="textInput" class="sr-only" data-translate="text_input_label">Enter your text here:</label>
+            <textarea id="textInput" 
+                      data-translate-placeholder="placeholder_text" 
+                      placeholder="Write here..." 
+                      oninput="autoResize(this)"
+                      onkeypress="checkEnter(event)"
+                      aria-describedby="text-input-help"
+                      rows="3"></textarea>
+            <div id="text-input-help" class="sr-only" data-translate="text_input_help">Type your text here. Press Enter to convert to speech, or use the buttons below for other actions.</div>
+        </section>
 
-    <div id="suggestions" style="margin-top: 20px;"></div>
+        <section aria-labelledby="action-buttons">
+            <h2 id="action-buttons" class="sr-only" data-translate="action_buttons_section">Actions</h2>
+            <button onclick="correggiTesto()" 
+                    data-translate="gpt_button" 
+                    aria-describedby="gpt-help">GPT</button>
+            <div id="gpt-help" class="sr-only" data-translate="gpt_help">Correct text using AI</div>
+            
+            <button onclick="convertiVoce()" 
+                    data-translate="speak_button" 
+                    aria-describedby="speak-help">Speak</button>
+            <div id="speak-help" class="sr-only" data-translate="speak_help">Convert text to speech</div>
+            
+            <button onclick="cancellaTesto()" 
+                    data-translate="clear_button" 
+                    aria-describedby="clear-help">Clear</button>
+            <div id="clear-help" class="sr-only" data-translate="clear_help">Clear the text field</div>
+            
+            <button onclick="toggleSettings()" 
+                    data-translate="settings_button" 
+                    aria-describedby="settings-help"
+                    aria-expanded="false"
+                    aria-controls="settings">⚙️ Settings</button>
+            <div id="settings-help" class="sr-only" data-translate="settings_help">Open or close settings panel</div>
+            
+            <button onclick="toggleFullScreen()" 
+                    data-translate="fullscreen_button" 
+                    aria-describedby="fullscreen-help">🔲 Full Screen</button>
+            <div id="fullscreen-help" class="sr-only" data-translate="fullscreen_help">Toggle full screen mode</div>
+            
+            <button onclick="attivaAscolto()" 
+                    data-translate="conversation_button" 
+                    aria-describedby="conversation-help">🎤 Conversation</button>
+            <div id="conversation-help" class="sr-only" data-translate="conversation_help">Start voice conversation mode</div>
+            
+            <button onclick="apriIstruzioni()" 
+                    data-translate="instructions_button" 
+                    aria-describedby="instructions-help">📖 Read Instructions</button>
+            <div id="instructions-help" class="sr-only" data-translate="instructions_help">Open instructions in a new tab</div>
+        </section>
 
-    <p id="status"></p>
-    <p id="loading" data-translate="loading_text">Processing...</p>
-    <audio id="audioPlayer" controls></audio>
+        <section aria-labelledby="suggestions-section">
+            <div id="suggestions" aria-live="polite" style="margin-top: 20px;"></div>
+        </section>
 
-    <div id="settings">
-        <h3 data-translate="api_settings_title">API Settings</h3>
-        <label data-translate="elevenlabs_api_key">ElevenLabs API Key: </label><input type="password" id="apiKey"><br>
-        <label data-translate="voice_id">Voice ID: </label><input type="text" id="voiceId"><br>
-        <label data-translate="tts_model">TTS Model: </label><input type="text" id="modelTTS" value="eleven_flash_v2_5"><br>
-        <label data-translate="stability">Stability: </label><input type="number" id="stability" step="0.1" min="0" max="1" value="0.5"><br>
-        <label data-translate="similarity_boost">Similarity Boost: </label><input type="number" id="similarity" step="0.1" min="0" max="1"
-            value="0.9"><br>
-        <h3 data-translate="gpt_settings_title">GPT Settings</h3>
-        <label data-translate="gpt_api_key">GPT API Key: </label><input type="password" id="gptApiKey"><br>
-        <label data-translate="gpt_model">GPT Model: </label><input type="text" id="gptModel" value="gpt-3.5-turbo"><br>
-        <label data-translate="gpt_prompt">GPT Prompt: </label><textarea
-            id="gptPrompt">Correct typing, punctuation and grammar errors in the text. Do not change the meaning of the sentence. Only correct the sentence. Do not interact with the user.</textarea><br>
-        <button onclick="salvaSettings()" data-translate="save_settings">Save Settings</button>
-    </div>
+        <section aria-labelledby="status-section">
+            <h2 id="status-section" class="sr-only" data-translate="status_section">Status and Audio</h2>
+            <p id="status" aria-live="polite"></p>
+            <p id="loading" data-translate="loading_text" aria-live="polite" style="display: none;">Processing...</p>
+            <audio id="audioPlayer" controls aria-label="Generated speech audio"></audio>
+        </section>
 
-    <div id="autoclick-settings" style="margin-top: 20px; text-align: center;">
-        <label>
-            <input type="checkbox" id="toggleAutoclick"> <span data-translate="enable_autoclick">Enable auto-click</span>
-        </label>
-        <label style="margin-left: 10px;">
-            <span data-translate="duration_seconds">Duration (sec): </span><input type="number" id="autoclickDuration" value="2" min="1" style="width: 50px;">
-        </label>
-    </div>
+        <section id="settings" aria-labelledby="settings-title" role="dialog" aria-hidden="true">
+            <h2 id="settings-title" data-translate="api_settings_title">API Settings</h2>
+            
+            <fieldset>
+                <legend data-translate="elevenlabs_settings">ElevenLabs Settings</legend>
+                <label for="apiKey" data-translate="elevenlabs_api_key">ElevenLabs API Key:</label>
+                <input type="password" id="apiKey" aria-describedby="apikey-help">
+                <div id="apikey-help" class="sr-only" data-translate="apikey_help">Enter your ElevenLabs API key for text-to-speech</div>
+                
+                <label for="voiceId" data-translate="voice_id">Voice ID:</label>
+                <input type="text" id="voiceId" aria-describedby="voiceid-help">
+                <div id="voiceid-help" class="sr-only" data-translate="voiceid_help">Enter the voice ID from ElevenLabs</div>
+                
+                <label for="modelTTS" data-translate="tts_model">TTS Model:</label>
+                <input type="text" id="modelTTS" value="eleven_flash_v2_5" aria-describedby="model-help">
+                <div id="model-help" class="sr-only" data-translate="model_help">Text-to-speech model to use</div>
+                
+                <label for="stability" data-translate="stability">Stability:</label>
+                <input type="number" id="stability" step="0.1" min="0" max="1" value="0.5" aria-describedby="stability-help">
+                <div id="stability-help" class="sr-only" data-translate="stability_help">Voice stability from 0 to 1</div>
+                
+                <label for="similarity" data-translate="similarity_boost">Similarity Boost:</label>
+                <input type="number" id="similarity" step="0.1" min="0" max="1" value="0.9" aria-describedby="similarity-help">
+                <div id="similarity-help" class="sr-only" data-translate="similarity_help">Voice similarity boost from 0 to 1</div>
+            </fieldset>
+            
+            <fieldset>
+                <legend data-translate="gpt_settings_title">GPT Settings</legend>
+                <label for="gptApiKey" data-translate="gpt_api_key">GPT API Key:</label>
+                <input type="password" id="gptApiKey" aria-describedby="gptkey-help">
+                <div id="gptkey-help" class="sr-only" data-translate="gptkey_help">Enter your OpenAI API key for text correction</div>
+                
+                <label for="gptModel" data-translate="gpt_model">GPT Model:</label>
+                <input type="text" id="gptModel" value="gpt-3.5-turbo" aria-describedby="gptmodel-help">
+                <div id="gptmodel-help" class="sr-only" data-translate="gptmodel_help">GPT model to use for text correction</div>
+                
+                <label for="gptPrompt" data-translate="gpt_prompt">GPT Prompt:</label>
+                <textarea id="gptPrompt" aria-describedby="prompt-help">Correct typing, punctuation and grammar errors in the text. Do not change the meaning of the sentence. Only correct the sentence. Do not interact with the user.</textarea>
+                <div id="prompt-help" class="sr-only" data-translate="prompt_help">Instructions for the AI text correction</div>
+            </fieldset>
+            
+            <button onclick="salvaSettings()" data-translate="save_settings">Save Settings</button>
+        </section>
 
-    <footer>
-        <p><strong>Privacy Notice:</strong> ASPHI Onlus, who hosts this page, never receives or stores any user data. All data remains in your browser and is only sent directly to the AI services you configure (OpenAI/ChatGPT for text processing and ElevenLabs for voice synthesis) when you make requests. Speech recognition is processed locally in your browser.</p>
-        <p>Please refer to the respective privacy policies of <a href="https://openai.com/privacy/" target="_blank">OpenAI</a> and <a href="https://elevenlabs.io/privacy" target="_blank">ElevenLabs</a> for information on how they handle your data.</p>
+        <section aria-labelledby="autoclick-section">
+            <h2 id="autoclick-section" class="sr-only" data-translate="autoclick_section">Auto-click Settings</h2>
+            <div id="autoclick-settings" style="margin-top: 20px; text-align: center;">
+                <fieldset>
+                    <legend data-translate="autoclick_legend">Auto-click Configuration</legend>
+                    <label for="toggleAutoclick">
+                        <input type="checkbox" id="toggleAutoclick" aria-describedby="autoclick-help"> 
+                        <span data-translate="enable_autoclick">Enable auto-click</span>
+                    </label>
+                    <div id="autoclick-help" class="sr-only" data-translate="autoclick_help">Automatically activate buttons when hovering</div>
+                    
+                    <label for="autoclickDuration" style="margin-left: 10px;">
+                        <span data-translate="duration_seconds">Duration (sec):</span>
+                        <input type="number" id="autoclickDuration" value="2" min="1" style="width: 50px;" aria-describedby="duration-help">
+                    </label>
+                    <div id="duration-help" class="sr-only" data-translate="duration_help">Time in seconds before auto-activation</div>
+                </fieldset>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <section aria-labelledby="privacy-notice">
+            <h2 id="privacy-notice" data-translate="privacy_notice_title">Privacy Notice</h2>
+            <p><strong data-translate="privacy_notice_strong">Privacy Notice:</strong> <span data-translate="privacy_notice_text">ASPHI Onlus, who hosts this page, never receives or stores any user data. All data remains in your browser and is only sent directly to the AI services you configure (OpenAI/ChatGPT for text processing and ElevenLabs for voice synthesis) when you make requests. Speech recognition is processed locally in your browser.</span></p>
+            <p data-translate="privacy_policies_text">Please refer to the respective privacy policies of <a href="https://openai.com/privacy/" target="_blank" rel="noopener" data-translate="openai_link">OpenAI</a> and <a href="https://elevenlabs.io/privacy" target="_blank" rel="noopener" data-translate="elevenlabs_link">ElevenLabs</a> for information on how they handle your data.</p>
+        </section>
     </footer>
 </body>
 
