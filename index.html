@@ -126,6 +126,10 @@
                 <label for="gptPrompt" data-translate="gpt_prompt">GPT Prompt:</label>
                 <textarea id="gptPrompt" aria-describedby="prompt-help">Correct typing, punctuation and grammar errors in the text. Do not change the meaning of the sentence. Only correct the sentence. Do not interact with the user.</textarea>
                 <div id="prompt-help" class="sr-only" data-translate="prompt_help">Instructions for the AI text correction</div>
+                
+                <label for="userDescription" data-translate="user_description">User Description:</label>
+                <textarea id="userDescription" aria-describedby="user-description-help" data-translate-placeholder="user_description_placeholder" placeholder="Describe yourself (age, interests, profession, etc.) to help AI provide more contextual responses..."></textarea>
+                <div id="user-description-help" class="sr-only" data-translate="user_description_help">Describe yourself to help AI understand context for corrections and conversation responses</div>
             </fieldset>
             
             <button onclick="salvaSettings()" data-translate="save_settings">Save Settings</button>

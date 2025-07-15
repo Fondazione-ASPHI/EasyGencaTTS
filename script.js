@@ -23,6 +23,7 @@ const translations = {
         gpt_api_key: "GPT API Key:",
         gpt_model: "GPT Model:",
         gpt_prompt: "GPT Prompt:",
+        user_description: "User Description:",
         save_settings: "Save Settings",
         enable_autoclick: "Enable auto-click",
         duration_seconds: "Duration (sec):",
@@ -49,6 +50,7 @@ const translations = {
         gptkey_help: "Enter your OpenAI API key for text correction",
         gptmodel_help: "GPT model to use for text correction",
         prompt_help: "Instructions for the AI text correction",
+        user_description_help: "Describe yourself to help AI understand context for corrections and conversation responses",
         autoclick_section: "Auto-click Settings",
         autoclick_legend: "Auto-click Configuration",
         autoclick_help: "Automatically activate buttons when hovering",
@@ -76,7 +78,8 @@ const translations = {
         text_correction_error: "Error in text correction",
         audio_generation_error: "Error in audio generation",
         fullscreen_error: "Error activating full screen: ",
-        error: "Error: "
+        error: "Error: ",
+        user_description_placeholder: "Describe yourself (age, interests, profession, etc.) to help AI provide more contextual responses..."
     },
     it: {
         title: "Easy GencaTTS @Fondazione ASPHI Onlus",
@@ -99,6 +102,7 @@ const translations = {
         gpt_api_key: "GPT API Key:",
         gpt_model: "Modello GPT:",
         gpt_prompt: "Prompt GPT:",
+        user_description: "Descrizione Utente:",
         save_settings: "Salva Impostazioni",
         enable_autoclick: "Abilita clic automatico",
         duration_seconds: "Durata (sec):",
@@ -125,6 +129,7 @@ const translations = {
         gptkey_help: "Inserisci la tua chiave API OpenAI per la correzione testo",
         gptmodel_help: "Modello GPT da usare per la correzione testo",
         prompt_help: "Istruzioni per la correzione AI del testo",
+        user_description_help: "Descrivi te stesso per aiutare l'AI a comprendere il contesto per correzioni e risposte di conversazione",
         autoclick_section: "Impostazioni Clic Automatico",
         autoclick_legend: "Configurazione Clic Automatico",
         autoclick_help: "Attiva automaticamente i pulsanti al passaggio del mouse",
@@ -152,7 +157,8 @@ const translations = {
         text_correction_error: "Errore nella correzione del testo",
         audio_generation_error: "Errore nella generazione audio",
         fullscreen_error: "Errore nell'attivazione dello schermo intero: ",
-        error: "Errore: "
+        error: "Errore: ",
+        user_description_placeholder: "Descriviti (età, interessi, professione, ecc.) per aiutare l'AI a fornire risposte più contestualizzate..."
     }
 };
 
@@ -250,7 +256,8 @@ function salvaSettings() {
         similarity: document.getElementById("similarity").value,
         gptApiKey: document.getElementById("gptApiKey").value,
         gptModel: document.getElementById("gptModel").value,
-        gptPrompt: document.getElementById("gptPrompt").value
+        gptPrompt: document.getElementById("gptPrompt").value,
+        userDescription: document.getElementById("userDescription").value
     };
     localStorage.setItem("ttsSettings", JSON.stringify(settings));
     alert(getTranslation('settings_saved'));
@@ -267,6 +274,7 @@ function caricaSettings() {
         document.getElementById("gptApiKey").value = settings.gptApiKey || "";
         document.getElementById("gptModel").value = settings.gptModel || "gpt-3.5-turbo";
         document.getElementById("gptPrompt").value = settings.gptPrompt || getTranslation('gpt_prompt_default');
+        document.getElementById("userDescription").value = settings.userDescription || "";
     }
 }
 
@@ -320,9 +328,19 @@ async function generaSuggerimenti(testoRiconosciuto) {
     document.getElementById("status").innerText = getTranslation('generating_suggestions');
 
     try {
-        const prompt = currentLanguage === 'it' ? 
+        // Costruisci il prompt di base
+        let basePrompt = currentLanguage === 'it' ? 
             `A partire da questa frase: "${testoRiconosciuto}", genera 6 risposte plausibili nel contesto di una conversazione dove tu sei la persona a cui è rivolta la frase riconosciuta. Non numerare le frasi.` :
             `Based on this sentence: "${testoRiconosciuto}", generate 6 plausible responses in the context of a conversation where you are the person to whom the recognized sentence is addressed. Do not number the sentences.`;
+
+        // Aggiungi la descrizione utente se disponibile
+        let fullPrompt = basePrompt;
+        if (settings.userDescription && settings.userDescription.trim()) {
+            const userContextIntro = currentLanguage === 'it' ? 
+                `\n\nContesto utente: Stai assistendo un utente con il seguente background: "${settings.userDescription.trim()}". Considera questa informazione per fornire risposte più appropriate e contestualizzate.` :
+                `\n\nUser context: You are assisting a user with the following background: "${settings.userDescription.trim()}". Consider this information to provide more appropriate and contextualized responses.`;
+            fullPrompt += userContextIntro;
+        }
 
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
@@ -332,7 +350,7 @@ async function generaSuggerimenti(testoRiconosciuto) {
             },
             body: JSON.stringify({
                 model: settings.gptModel,
-                messages: [{ role: "system", content: prompt }]
+                messages: [{ role: "system", content: fullPrompt }]
             })
         });
 
@@ -376,6 +394,15 @@ async function correggiTesto() {
     document.getElementById("status").innerText = "";
 
     try {
+        // Costruisci il prompt di sistema includendo la descrizione utente se disponibile
+        let systemPrompt = settings.gptPrompt;
+        if (settings.userDescription && settings.userDescription.trim()) {
+            const userContextIntro = currentLanguage === 'it' ? 
+                `Stai assistendo un utente con il seguente background: "${settings.userDescription.trim()}". Considera questa informazione quando correggi il testo per mantenere appropriati tono e contesto. ` :
+                `You are assisting a user with the following background: "${settings.userDescription.trim()}". Consider this information when correcting the text to maintain appropriate tone and context. `;
+            systemPrompt = userContextIntro + systemPrompt;
+        }
+
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -384,7 +411,7 @@ async function correggiTesto() {
             },
             body: JSON.stringify({
                 model: settings.gptModel,
-                messages: [{ role: "system", content: settings.gptPrompt },
+                messages: [{ role: "system", content: systemPrompt },
                 { role: "user", content: text }]
             })
         });
