@@ -361,12 +361,7 @@ function mostraSuggerimenti(suggerimenti) {
         btn.onclick = async function () {
             document.getElementById("textInput").value = frase.trim();
             suggestionsDiv.innerHTML = ""; // Rimuove tutti i suggerimenti dopo la selezione
-            await convertiVoce();
-
-            const audioPlayer = document.getElementById("audioPlayer");
-            audioPlayer.onended = function () {
-                attivaAscolto(); // Riattiva l'ascolto quando l'audio finisce
-            };
+            await convertiVocePerConversazione();
         };
         suggestionsDiv.appendChild(btn);
     });
@@ -459,6 +454,92 @@ async function convertiVoce() {
         
         document.getElementById("audioPlayer").src = URL.createObjectURL(audioBlob);
         document.getElementById("audioPlayer").play();
+        document.getElementById("status").innerText = getTranslation('audio_generated');
+    } catch (error) {
+        document.getElementById("status").innerText = getTranslation('error') + error.message;
+    } finally {
+        document.getElementById("loading").style.display = "none";
+    }
+}
+
+// Funzione specifica per la conversazione che riattiva l'ascolto solo dopo che l'audio è finito
+async function convertiVocePerConversazione() {
+    let text = document.getElementById("textInput").value.trim();
+    let settings = JSON.parse(localStorage.getItem("ttsSettings"));
+    if (!text || !settings.apiKey) return alert(getTranslation('configure_elevenlabs'));
+
+    // Create a unique cache key based on text and voice settings
+    const cacheKey = `tts_${settings.voiceId}_${settings.modelTTS}_${btoa(text)}`;
+    
+    // Check if we have cached audio for this exact text and settings
+    const cachedAudio = localStorage.getItem(cacheKey);
+    if (cachedAudio) {
+        // Use cached audio
+        try {
+            const audioBlob = dataURItoBlob(cachedAudio);
+            const audioPlayer = document.getElementById("audioPlayer");
+            audioPlayer.src = URL.createObjectURL(audioBlob);
+            
+            // Rimuovi eventuali listener precedenti per evitare conflitti
+            audioPlayer.onended = null;
+            
+            // Imposta il nuovo listener per riattivare l'ascolto alla fine dell'audio
+            audioPlayer.onended = function () {
+                setTimeout(() => {
+                    attivaAscolto(); // Riattiva l'ascolto quando l'audio finisce
+                }, 500); // Piccola pausa per evitare problemi di timing
+            };
+            
+            audioPlayer.play();
+            document.getElementById("status").innerText = getTranslation('audio_from_cache');
+            return;
+        } catch (error) {
+            // If cached audio is corrupted, remove it and generate new one
+            localStorage.removeItem(cacheKey);
+        }
+    }
+
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("status").innerText = "";
+
+    try {
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${settings.voiceId}`, {
+            method: "POST",
+            headers: { "xi-api-key": settings.apiKey, "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text, model_id: settings.modelTTS })
+        });
+
+        if (!response.ok) throw new Error(getTranslation('audio_generation_error'));
+
+        const audioBlob = await response.blob();
+        
+        // Cache the audio blob as data URI
+        const reader = new FileReader();
+        reader.onload = function() {
+            try {
+                // Store in cache, but manage storage size
+                manageTTSCache();
+                localStorage.setItem(cacheKey, reader.result);
+            } catch (error) {
+                console.warn("Could not cache audio due to storage limitations:", error);
+            }
+        };
+        reader.readAsDataURL(audioBlob);
+        
+        const audioPlayer = document.getElementById("audioPlayer");
+        audioPlayer.src = URL.createObjectURL(audioBlob);
+        
+        // Rimuovi eventuali listener precedenti per evitare conflitti
+        audioPlayer.onended = null;
+        
+        // Imposta il nuovo listener per riattivare l'ascolto alla fine dell'audio
+        audioPlayer.onended = function () {
+            setTimeout(() => {
+                attivaAscolto(); // Riattiva l'ascolto quando l'audio finisce
+            }, 500); // Piccola pausa per evitare problemi di timing
+        };
+        
+        audioPlayer.play();
         document.getElementById("status").innerText = getTranslation('audio_generated');
     } catch (error) {
         document.getElementById("status").innerText = getTranslation('error') + error.message;
